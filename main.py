@@ -1,4 +1,4 @@
-import Day04
+import Day05
 
 #timing
-Day04.Day04_P2()
+Day05.Day05_P2()
