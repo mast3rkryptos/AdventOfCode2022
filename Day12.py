@@ -1,20 +1,19 @@
-class Node:
-    def __init__(self, id, elevation):
-        self.id = id
-        self.elevation = elevation
-        self.connections = []
+pathLengths = []
 
-    def __str__(self):
-        return f"Node {self.id}\n  Elevation: {self.elevation}\n  Connections: {self.connections}\n"
+def Navigate(current, destination, heightmap, currentPathLength):
+    if current == destination:
+        pathLengths.append(currentPathLength)
+    else:
+        currentPathLength += 1
+        if current[0] > 0 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]-1][current[1]]) <= 1:
+            Navigate((current[0]-1, current[1]), destination, heightmap, currentPathLength)
+        if current[0] < len(heightmap) - 1 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]+1][current[1]]) <= 1:
+            Navigate((current[0]+1, current[1]), destination, heightmap, currentPathLength)
+        if current[1] > 0 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]-1][current[1]-1]) <= 1:
+            Navigate((current[0], current[1]-1), destination, heightmap, currentPathLength)
+        if current[1] < len(heightmap[current[0]]) - 1 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]][current[1]+1]) <= 1:
+            Navigate((current[0], current[1]+1), destination, heightmap, currentPathLength)
 
-    def AddConnection(self, id, elevation):
-        self.connections.append((id, elevation - self.elevation))
-        return
-
-    def Navigate(self, nodes, currentPathLength):
-        for connection in self.connections:
-            if connection[1] <= 1:
-                nodes[connection[0]].Navigate(nodes)
 
 def Day12_P1():
     heightmap = []
@@ -24,13 +23,16 @@ def Day12_P1():
     with open("Day12_Input.txt") as f:
         for line in f:
             heightmap.append(line.strip())
+    # Find the starting and ending locations
     for i in range(len(heightmap)):
         for j in range(len(heightmap[i])):
-            nodes[f"{i},{j}"] = Node(f"{i},{j}", ord(heightmap[i][j]) - 97 if heightmap[i][j] != "S" and heightmap[i][j] != "E" else (0 if heightmap[i][j] == "S" else 26))
             if heightmap[i][j] == "S":
-                start = nodes[f"{i},{j}"]
+                start = (i, j)
+                heightmap[i] = heightmap[i].replace("S", "a")
             elif heightmap[i][j] == "E":
-                end = nodes[f"{i},{j}"]
+                end = (i, j)
+                heightmap[i] = heightmap[i].replace("E", "z")
 
-    start.Navigate(nodes, 0)
-    print(start, end)
+
+    Navigate(end, start, heightmap, 0)
+    print(start, end, pathLengths)
