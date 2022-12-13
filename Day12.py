@@ -1,18 +1,45 @@
 pathLengths = []
 
-def Navigate(current, destination, heightmap, currentPathLength):
+def Navigate(current, destination, heightmap, currentPath):
+    newPath = currentPath
+    newPath.append(current)
+    #print(newPath)
     if current == destination:
-        pathLengths.append(currentPathLength)
+        pathLengths.append(len(newPath) - 1)
     else:
-        currentPathLength += 1
-        if current[0] > 0 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]-1][current[1]]) <= 1:
-            Navigate((current[0]-1, current[1]), destination, heightmap, currentPathLength)
-        if current[0] < len(heightmap) - 1 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]+1][current[1]]) <= 1:
-            Navigate((current[0]+1, current[1]), destination, heightmap, currentPathLength)
-        if current[1] > 0 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]-1][current[1]-1]) <= 1:
-            Navigate((current[0], current[1]-1), destination, heightmap, currentPathLength)
-        if current[1] < len(heightmap[current[0]]) - 1 and 0 <= ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]][current[1]+1]) <= 1:
-            Navigate((current[0], current[1]+1), destination, heightmap, currentPathLength)
+        if current[0] > 0 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0] - 1][current[1]])) == 1 and \
+                (current[0] - 1, current[1]) not in newPath:
+            Navigate((current[0]-1, current[1]), destination, heightmap, newPath)
+        elif current[0] > 0 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0] - 1][current[1]])) == 0 and \
+                (current[0] - 1, current[1]) not in newPath:
+            Navigate((current[0] - 1, current[1]), destination, heightmap, newPath)
+        if current[0] < len(heightmap) - 1 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0] + 1][current[1]])) == 1 and \
+                (current[0] + 1, current[1]) not in newPath:
+            Navigate((current[0] + 1, current[1]), destination, heightmap, newPath)
+        elif current[0] < len(heightmap) - 1 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0] + 1][current[1]])) == 0 and \
+                (current[0] + 1, current[1]) not in newPath:
+            Navigate((current[0] + 1, current[1]), destination, heightmap, newPath)
+        if current[1] > 0 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]][current[1] - 1])) == 1 and \
+                (current[0], current[1] - 1) not in newPath:
+            Navigate((current[0], current[1] - 1), destination, heightmap, newPath)
+        elif current[1] > 0 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]][current[1] - 1])) == 0 and \
+                (current[0], current[1] - 1) not in newPath:
+            Navigate((current[0], current[1] - 1), destination, heightmap, newPath)
+        if current[1] < len(heightmap[current[0]]) - 1 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]][current[1] + 1])) == 1 and \
+                (current[0], current[1] + 1) not in newPath:
+            Navigate((current[0], current[1] + 1), destination, heightmap, newPath)
+        elif current[1] < len(heightmap[current[0]]) - 1 and \
+                (ord(heightmap[current[0]][current[1]]) - ord(heightmap[current[0]][current[1] + 1])) == 0 and \
+                (current[0], current[1] + 1) not in newPath:
+            Navigate((current[0], current[1] + 1), destination, heightmap, newPath)
+        newPath.pop(-1)
 
 
 def Day12_P1():
@@ -34,5 +61,5 @@ def Day12_P1():
                 heightmap[i] = heightmap[i].replace("E", "z")
 
 
-    Navigate(end, start, heightmap, 0)
-    print(start, end, pathLengths)
+    Navigate(end, start, heightmap, [])
+    print(start, end, min(pathLengths))
